@@ -36,10 +36,6 @@ def notebook_to_page(notebook_file, confluence_url, username=None, password=None
     extra_labels: list, optional
         Additional labels to add to the page (default: None)
     """
-    if username is None:
-        username = getpass.getuser()
-    if password is None:
-        password = getpass.getpass('Confluence password for {}:'.format(username))
     if extra_labels is None:
         extra_labels = []
 
