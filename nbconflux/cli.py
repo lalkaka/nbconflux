@@ -17,6 +17,7 @@ def main(argv=None):
         "3. User prompts")
     parser.add_argument('notebook', type=str, help='Path to local notebook (ipynb)')
     parser.add_argument('url', type=str, help='URL of Confluence page to update')
+    parser.add_argument('--no-prompt', action='store_true', help='Do not prompt for password or username')
     parser.add_argument('--exclude-toc', action='store_true', help='Do not generate a table of contents')
     parser.add_argument('--exclude-ipynb', action='store_true', help='Do not attach the notebook to the page')
     parser.add_argument('--exclude-style', action='store_true', help='Do not include the Jupyter base stylesheet')
@@ -44,16 +45,17 @@ def main(argv=None):
                 password = segs[1]
                 print('Using credentials for {} from configuration file'.format(username))
 
-    # Prompt the user for missing credentials
-    if username is None:
-        current = getpass.getuser()
-        current = current[2:] if current.startswith('p-') else current
-        username = input('Confluence username ({}): '.format(current))
-        # Use the current username if the user doesn't enter anything
-        if not username.strip():
-            username = current
-    if password is None:
-        password = getpass.getpass('Confluence password: ')
+    if not args.no_prompt:
+        # Prompt the user for missing credentials
+        if username is None:
+            current = getpass.getuser()
+            current = current[2:] if current.startswith('p-') else current
+            username = input('Confluence username ({}): '.format(current))
+            # Use the current username if the user doesn't enter anything
+            if not username.strip():
+                username = current
+        if password is None:
+            password = getpass.getpass('Confluence password: ')
 
     notebook_to_page(args.notebook, args.url, username, password,
                      generate_toc=not args.exclude_toc, attach_ipynb=not args.exclude_ipynb,
