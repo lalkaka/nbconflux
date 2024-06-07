@@ -47,8 +47,8 @@ class ConfluenceExporter(HTMLExporter):
         Add MathJax to the page to render equations (default: False)
     """
     url = Unicode(config=True, help='Confluence URL to update with notebook content')
-    username = Unicode(config=True, help='Confluence username')
-    password = Unicode(config=True, help='Confluence password')
+    username = Unicode(config=True, allow_none=True, help='Confluence username')
+    password = Unicode(config=True ,allow_none=True, help='Confluence password')
     cookies = Dict(config=True, help='Confluence cookies')
     generate_toc = Bool(config=True, default_value=True, help='Show a table of contents at the top of the page?')
     attach_ipynb = Bool(config=True, default_value=True, help='Attach the notebook ipynb to the page?')
@@ -162,7 +162,7 @@ class ConfluenceExporter(HTMLExporter):
             resp = requests.get('{server}/rest/api/content?title={title}&spaceKey={space}'.format(server=server,
                                                                                                   title=title,
                                                                                                   space=space),
-                                auth=(self.username, self.password),
+                                auth=(self.username, self.password) if self.username and self.password else None,
                                 cookies=self.cookies
                                )
             resp.raise_for_status()
@@ -195,7 +195,7 @@ class ConfluenceExporter(HTMLExporter):
         # Fetch version number from the existing page so that we can increment it by 1.
         resp = requests.get('{server}/rest/api/content/{page_id}'.format(server=self.server,
                                                                          page_id=page_id),
-                            auth=(self.username, self.password),
+                            auth=(self.username, self.password) if self.username and self.password else None,
                             cookies=self.cookies
                             )
         resp.raise_for_status()
@@ -221,7 +221,7 @@ class ConfluenceExporter(HTMLExporter):
                                    }
                                }
                             },
-                            auth=(self.username, self.password),
+                            auth=(self.username, self.password) if self.username and self.password else None,
                             cookies=self.cookies
                            )
 
@@ -249,7 +249,7 @@ class ConfluenceExporter(HTMLExporter):
         resp = requests.post('{server}/rest/api/content/{page_id}/label'.format(server=self.server,
                                                                                 page_id=page_id),
                              json=[dict(prefix='global', name=label)],
-                             auth=(self.username, self.password),
+                             auth=(self.username, self.password) if self.username and self.password else None,
                              cookies=self.cookies
                              )
         resp.raise_for_status()
@@ -283,7 +283,7 @@ class ConfluenceExporter(HTMLExporter):
                                  'X-Atlassian-Token': 'nocheck'
                              },
                              files=files,
-                             auth=(self.username, self.password),
+                             auth=(self.username, self.password) if self.username and self.password else None,
                              cookies=self.cookies
                              )
         resp.raise_for_status()
